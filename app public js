@@ -1,0 +1,38 @@
+document.addEventListener('DOMContentLoaded', () => {
+    const domainForm = document.getElementById('domain-form');
+    const domainList = document.getElementById('domain-list');
+
+    // Fetch and display domains
+    const fetchDomains = async () => {
+        const response = await fetch('http://localhost:3000/domains');
+        const data = await response.json();
+        domainList.innerHTML = '';
+        data.data.forEach(domain => {
+            const li = document.createElement('li');
+            li.textContent = `${domain.name} - ${domain.owner}`;
+            domainList.appendChild(li);
+        });
+    };
+
+    fetchDomains();
+
+    // Add new domain
+    domainForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const domainName = document.getElementById('domain-name').value;
+        const domainOwner = document.getElementById('domain-owner').value;
+
+        const response = await fetch('http://localhost:3000/domains', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ name: domainName, owner: domainOwner })
+        });
+
+        const data = await response.json();
+        if (data.message === 'success') {
+            fetchDomains();
+        }
+    });
+});
